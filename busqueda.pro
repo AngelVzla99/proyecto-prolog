@@ -1,25 +1,3 @@
-
-final( matriz, R/C ) :- R=3, C=3.
-inicial( matriz, R/C ) :- R = 1, C =1.
-
-movimiento( matriz, _, X/Y ) :- 
-    member(X,[0,1,-1]),
-    member(Y,[0,1,-1]).
-
-moverse( matriz, X/Y, DX/DY, I/J ) :-
-    I is X + DX,
-    J is Y + DY.
-
-legal( matriz, X/Y ) :- X>0, Y>0, X<4, Y<4.
-
-endState( Ans, [], Ans2 ) :- Ans = Ans2.
-endState( X/Y, [I/J|Resto], Ans ) :-
-    XX is X + I,
-    YY is Y + J,
-    endState( XX/YY, Resto, Ans ).
-
-% ------------------------------------------------------------
-
 ddfs( Problema, Estado, Movimientos ) :- 
     ddfs( Problema, Estado, Movimientos, 0 ).
 ddfs( Problema, Raiz, Movimientos, Depth ) :- 
@@ -49,6 +27,9 @@ simular(Problema) :-
     ddfs( Problema, Estado, Movimientos, 0 ),
     mostrar(Problema,Estado,Movimientos).
 
+:- discontiguous( [ inicial/2, final/2, movimiento/3, moverse/4, legal/2, mostrar/3 ] ).
+:- dynamic( [prueba/1, inicial/2, final/2] ).
+
 % ------------------------------------------------------------
 
 /*
@@ -60,15 +41,13 @@ simular(Problema) :-
 * la lista3 representa la esquina superior derecha de la Y
 */
 
-:- discontiguous( [ inicial/2, final/2, movimiento/3, moverse/4, legal/2, mostrar/3 ] ).
-:- dynamic( [prueba/1, inicial/2, final/2] ).
-
 /*
 Triunfa si logra resolver el problema de patio de operaciones 
 dado un estado inicial y un estado final unificando la lista de 
 operaciones
 */
 vagones( Inicial, Final, Operaciones ) :-
+    permutation(Inicial, Final),
     asserta( inicial( vagones, estacion(Inicial,[],[]) ) ),
     asserta( final( vagones, estacion(Final,[],[]) ) ),
     resolver( vagones, Operaciones ), !,
@@ -79,7 +58,7 @@ vagones( Inicial, Final, Operaciones ) :-
 /*
 movimientos validos en el problema de los vagones, usa 
 backtracking para tomar elementos de cada una de las 3 listas,
-unificando el tercer argumento
+unificando el tercer argumento, prueba las 4 opciones 
 */
 movimiento( vagones, estacion(L1,_,_), push(above,X) ) :- 
     length(L1, Len), between(1,Len,X). 
@@ -127,6 +106,8 @@ mostrar( estacion(L1,L2,L3) ) :-
     write("Lista1 => "), write(L1), nl, 
     write("Lista3 => \t\t"), write(L3), nl.
 
+% ====:> Funciones Auxiliares <:=====
+
 /*
 popFront(N,L1,Take,Rest) triunfa si se logran tomar N elementos
 de izquierda a derecha, unificando los elementos tomados en Take
@@ -150,6 +131,7 @@ popBack( N, L, Taken, Rest ) :-
 
 % ------------------------------------------------------------
 % Problema Control remoto
+
 
 
 /*

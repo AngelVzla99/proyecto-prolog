@@ -191,9 +191,9 @@ decider(AST,Mode) :- process(AST,Mode), fail.
 truthtable :- genTable(simple).
 truthtablepro :- genTable(pro).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Parser Adicional.... Hay que modificarlo porque usa la precedencia de prolog en vez de la del pdf
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Parser Adicional.... No me acorde que read lexeaba y parseaba, un puntico extra por el parser BNF-E? :'v
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 /*
 star(X,XS) parsea 0 o mas veces X, acumulando lo que este retorne en XS.
@@ -209,13 +209,19 @@ unaryOperator(OP) --> [:~:], {OP = (:~:)}.
 /*
 p2Operator parsea un operador de precedencia 2 y lo retorna.
 */
-p2Operator(OP)    --> [:/\:], {OP=(:/\:)} | [:\/:], {OP=(:\/:)}.
+p2Operator(OP)    --> [:/\:], {OP=(:/\:)}.
+
+/*
+p1Operator parsea un operador de precedencia 1 y lo retorna.
+*/
+p1Operator(OP)    -->  [:\/:], {OP=(:\/:)}.
 
 /*
 Gramatica BNFE asociada:
 
-e    -> p2
-p2   -> p3 ((:/\: | :\/:) p3)*
+e    -> p1
+p1   -> p1 (:\/: p2)*
+p2   -> p3 (:/\: p3)*
 p3   -> (:~:)* term
 term -> '('e')' | (pseudo)terminal.
 */
@@ -223,12 +229,14 @@ term -> '('e')' | (pseudo)terminal.
 /*
 Estructura del AST:
 
-AST = unary(<Unary Operator>, AST) 
-    | binary(<binary Operator>, LAST, RAST)
-    | leaf(<pseudo terminal>)
+AST = <Unary Operator> AST 
+    | LAST <binary Operator>RAST)
+    | <pseudo terminal>
 */
 
-e(AST)         --> p2(AST).
+e(AST)         --> p1(AST).
+p1(AST)        --> p2(AST1), star(p1R,XS), {buildLeftAssocBin(AST1,XS,AST)}.
+p1R(OP/AST1)   --> p1Operator(OP), p2(AST1).
 p2(AST)        --> p3(AST1), star(p2R,XS), {buildLeftAssocBin(AST1,XS,AST)}.
 p2R(OP/AST1)   --> p2Operator(OP), p3(AST1).
 p3(AST)        --> star(unaryOperator,UOPs), term(AST1), {buildUnaryTree(UOPs,AST1,AST)}. 

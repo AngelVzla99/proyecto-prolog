@@ -11,7 +11,7 @@
 
  
 :- op(500,yfx,:--:). % Auxiliar: usado porque no se trabajar con strings (hay errores al tratar de leer :\/: y :/\: por los caracteres de escape) 
-:- op(400,yfx,:++:). % Auxiliar: usado porque no se trabajar con strings (hay errores al tratar de leer :\/: y :/\: por los caracteres de escape)⌈
+:- op(400,yfx,:++:). % Auxiliar: usado porque no se trabajar con strings (hay errores al tratar de leer :\/: y :/\: por los caracteres de escape)
 :- op(500,yfx,:\/:). % Logical OR
 :- op(400,yfx,:/\:). % Logical AND
 :- op(200,fy,:~:).   % Logical NOT
@@ -180,6 +180,7 @@ rows(_,_,_).
 genTable(Mode)
     :- repeat  
     , write("formula: ")
+    , flush_output
     , read(X)
     , decider(X,Mode)
     , !.

@@ -12,7 +12,7 @@ final a profundidad 'depth' y una segunda pasada buscando 'continue'
 para saber si existen hojas sin ver a profundidad 'depth'
 */
 ddfs( Problema, Estado, Movimientos ) :- 
-    ddfs( Problema, Estado, Movimientos, 0 ). % Este lo puse porque lo dice el enunciado, pero no se usa
+    ddfs( Problema, Estado, Movimientos, 0 ).
 ddfs( Problema, Raiz, Movimientos, Depth ) :- 
     ddfs( Problema, Depth, Raiz, [Raiz], Movimientos, goal ), !. 
 ddfs( Problema, Raiz, Movimientos, Depth ) :- 
@@ -43,7 +43,7 @@ utilizados para llegar a ese estado
 */
 resolver( Problema, Movimientos ) :-
     inicial( Problema, Estado ), !,
-    ddfs( Problema, Estado, Movimientos, 0 ).
+    ddfs( Problema, Estado, Movimientos ).
 
 /*
 Este predicado es similar a resolver, la diferencia es que imprime
@@ -51,7 +51,7 @@ por standar output
 */
 simular(Problema) :-
     inicial( Problema, Estado ),
-    ddfs( Problema, Estado, Movimientos, 0 ),
+    ddfs( Problema, Estado, Movimientos ),
     mostrar(Problema,Estado,Movimientos).
 
 /*
@@ -204,16 +204,16 @@ unificando en proximo si este es el estado proximo tras usar el boton
 de Next en el i-esimo televisor
 */
 moverse( canales, televisores(N,T1,T2,T3,T4,_), 1, Proximo ) :- 
-    NewT1 is mod(T1+1,N),
+    NewT1 is mod(T1,N)+1,
     Proximo = televisores(N,NewT1,T2,T3,T4,1). 
 moverse( canales, televisores(N,T1,T2,T3,T4,_), 2, Proximo ) :- 
-    NewT2 is mod(T2+1,N),
+    NewT2 is mod(T2,N)+1,
     Proximo = televisores(N,T1,NewT2,T3,T4,2). 
 moverse( canales, televisores(N,T1,T2,T3,T4,_), 3, Proximo ) :- 
-    NewT3 is mod(T3+1,N),
+    NewT3 is mod(T3,N)+1,
     Proximo = televisores(N,T1,T2,NewT3,T4,3). 
 moverse( canales, televisores(N,T1,T2,T3,T4,_), 4, Proximo ) :- 
-    NewT4 is mod(T4+1,N),
+    NewT4 is mod(T4,N)+1,
     Proximo = televisores(N,T1,T2,T3,NewT4,4). 
 
 % Por como se hace el movimiento todos los estados son validos
